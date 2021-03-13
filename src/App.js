@@ -21,7 +21,7 @@ function App() {
   let [transitionEnded, setTransitionEnded] = useState(true); 
   let [translate, setTranslate] = useState(0);
   let [moveListener, setmoveListener] = useState('');
-  let centereSlidePosition = 50;
+  let [minimalTranslate, setMinimalTranslate] = useState(0);
 
 
   
@@ -33,14 +33,18 @@ useEffect(() => {
   let centered = false;
   let swiperWidth = swiperRef.current.offsetWidth;
   let swiperItems = swiperRef.current.childNodes;
+  let centeredPosition = (swiperWidth / 2) - swiperItems[currentSlide].offsetLeft - (swiperItems[currentSlide].offsetWidth / 2 ) ;
   
-  if(currentSlide != 0) {
+  if(currentSlide != 0 && !centered) {
   
     setTranslate(  swiperItems[0].offsetLeft - swiperItems[currentSlide].offsetLeft  ) 
+    
 
   } else if(centered){
 
-    setTranslate(swiperWidth / 2 + swiperItems[currentSlide].offsetLeft - swiperItems[currentSlide].offsetWidth / 2 )
+    setTranslate(centeredPosition);
+    setMinimalTranslate(centeredPosition)
+    
 
   }
   swiperRef.current.addEventListener('transitionstart', transitionStart);
@@ -70,12 +74,9 @@ function handleStart(e){
   e.preventDefault();
   let container = containerRef.current.getBoundingClientRect();
   let wrapper = swiperRef.current.getBoundingClientRect();
-  console.log(wrapper);
   setTransition('0ms');
   setmoveListener(true);
   setinitialTranslate(translate);
-  
-  
  
    setStartPos(e.clientX - wrapper.x + container.x)
 
@@ -147,7 +148,7 @@ function handleEnd(e){
     setTransition('300ms'); setTranslate(initialTranslate + swipeDirection)
     console.log('next position')
   }
-  
+ 
   
 }
 
