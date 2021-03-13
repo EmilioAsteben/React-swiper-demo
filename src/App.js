@@ -7,8 +7,8 @@ import {useRef, useEffect, useState} from 'react';
 function App() {
 
 
-  let startSlide = 0;
-  let offset = 70;
+  let startSlide = 2;
+  let offset = 0;
   let centeredSlides = false;
   let threshHold = 80;
   let spaceBetween = '50px'
@@ -193,12 +193,14 @@ setTranslate(e.clientX - startPos  )
 
   return (
     <div
+    
     onPointerMove ={moveListener ? (e) => {handleMove(e)} : undefined} 
     onPointerUp= {moveListener? (e) => {handleEnd(e)} : undefined}
     onPointerLeave = {moveListener? (e) => {handleEnd(e)} : undefined}
     className="App">
       
       <div
+      onPointerDown ={(e) => {handleStart(e);}} 
       ref={containerRef}
       className="swiper_container">
         
@@ -216,9 +218,9 @@ setTranslate(e.clientX - startPos  )
         }}
         // onPointerUp= {moveListener? () => handleEnd() : undefined}
         
-        onPointerMove ={moveListener ? (e) => {handleMove(e)} : undefined} 
+        // onPointerMove ={moveListener ? (e) => {handleMove(e)} : undefined} 
         
-        onPointerDown ={(e) => {handleStart(e);}} 
+        // onPointerDown ={(e) => {handleStart(e);}} 
         
         onPointerLeave = {() => {handleOut()}}
         
