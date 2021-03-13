@@ -6,22 +6,23 @@ import {useRef, useEffect, useState} from 'react';
 
 function App() {
 
-  
 
-  
+  let startSlide = 0;
+  let offset = 70;
+  let centeredSlides = false;
   let threshHold = 80;
   let spaceBetween = '50px'
   let numberOfSlides;
   let swiperRef = useRef(null);
   let containerRef = useRef(null);
-  let [currentSlide, setCurrentSlide] = useState(0)
+  let [currentSlide, setCurrentSlide] = useState(startSlide);
   let [initialTranslate, setinitialTranslate] = useState(0);
   let [startPos, setStartPos] = useState();
   let [transition, setTransition] = useState('0s');
   let [transitionEnded, setTransitionEnded] = useState(true); 
-  let [translate, setTranslate] = useState(0);
+  let [translate, setTranslate] = useState(offset);
   let [moveListener, setmoveListener] = useState('');
-  let [minimalTranslate, setMinimalTranslate] = useState(0);
+  let [minimalTranslate, setMinimalTranslate] = useState(offset);
 
 
   
@@ -30,25 +31,33 @@ function App() {
 
 useEffect(() => {
   //  document.addEventListener('pointerup', logListenerEvent)
-  let centered = false;
+  
   let swiperWidth = swiperRef.current.offsetWidth;
   let swiperItems = swiperRef.current.childNodes;
   let centeredPosition = (swiperWidth / 2) - swiperItems[currentSlide].offsetLeft - (swiperItems[currentSlide].offsetWidth / 2 ) ;
   
-  if(currentSlide != 0 && !centered) {
+  if(currentSlide != 0 && !centeredSlides) {
   
-    setTranslate(  swiperItems[0].offsetLeft - swiperItems[currentSlide].offsetLeft  ) 
+    setTranslate(  swiperItems[0].offsetLeft - swiperItems[currentSlide].offsetLeft - offset  ) 
+    setMinimalTranslate(-offset)
     
 
-  } else if(centered){
+  } else if(centeredSlides){
 
-    setTranslate(centeredPosition);
-    setMinimalTranslate(centeredPosition)
+    setTranslate(centeredPosition - offset);
+    setMinimalTranslate( swiperWidth / 2 - swiperItems[0].offsetLeft - swiperItems[0].offsetWidth /2 - offset)
     
 
   }
   swiperRef.current.addEventListener('transitionstart', transitionStart);
   console.log('useeffect')
+  console.log(startSlide)
+
+  // console.log ('swiper width 1/2', swiperWidth / 2)
+  // console.log ('item offset', swiperItems[0].offsetLeft)
+  // console.log ('item width'swiperItems[0].offsetWidth)
+
+  
   
     
   // for (let key in swiperItems){
@@ -93,18 +102,30 @@ function transitionStart(){
 function handleEnd(e){
   e.preventDefault();
   setmoveListener(false);
-  let swipeItem = swiperRef.current.childNodes
+  let swipeItem = swiperRef.current.childNodes;
+  let maxTranslate = swipeItem[swipeItem.length - 1].offsetLeft - swipeItem[0].offsetLeft - minimalTranslate; 
+  let nextSlideDiff = 0;
+  let prevSlideDiff = 0;
+
+  if(centeredSlides){
+    nextSlideDiff =  currentSlide != swipeItem.length - 1  ?  (swipeItem[currentSlide].nextSibling.offsetWidth -swipeItem[currentSlide].offsetWidth) / 2  : maxTranslate = translate;
+    prevSlideDiff = currentSlide != 0  ? (swipeItem[currentSlide].offsetWidth - swipeItem[currentSlide].previousSibling.offsetWidth) / 2 : '';
+    console.log(minimalTranslate)
+  }
+
+
+  
 
 
   
   let xDiff = initialTranslate - translate;
   
-  let swipeLeft = currentSlide != swipeItem.length - 1  ? swipeItem[currentSlide].offsetLeft - swipeItem[currentSlide].nextSibling.offsetLeft : ''
-  let swipeRight =  currentSlide != 0  ? swipeItem[currentSlide].offsetLeft - swipeItem[currentSlide].previousSibling.offsetLeft : ''  ;
+  let swipeLeft = currentSlide != swipeItem.length - 1  ? swipeItem[currentSlide].offsetLeft - swipeItem[currentSlide].nextSibling.offsetLeft - nextSlideDiff : ''
+  let swipeRight =  currentSlide != 0  ? swipeItem[currentSlide].offsetLeft - swipeItem[currentSlide].previousSibling.offsetLeft  + prevSlideDiff: ''  ;
   let wrapperX = swiperRef.current.getBoundingClientRect().x;
   
   let swipeAccess = Math.sign(xDiff) == Math.sign(initialTranslate);
-  let maxTranslate = swipeItem[swipeItem.length - 1].offsetLeft - swipeItem[0].offsetLeft; 
+  
   
   
 
@@ -136,8 +157,8 @@ function handleEnd(e){
  
   if(Math.abs(xDiff) < threshHold  ||
   
-  Math.abs(initialTranslate) >= maxTranslate && !swipeAccess ||
-  initialTranslate == 0 && Math.sign(xDiff) < 0 
+  initialTranslate <= -maxTranslate && !swipeAccess ||
+  initialTranslate == minimalTranslate && Math.sign(xDiff) < 0 
   
   ) {
   
@@ -148,7 +169,9 @@ function handleEnd(e){
     setTransition('300ms'); setTranslate(initialTranslate + swipeDirection)
     console.log('next position')
   }
- 
+ console.log('minimal translate', minimalTranslate);
+ console.log('max translate',maxTranslate);
+ console.log('initial translate', initialTranslate);
   
 }
 
@@ -172,6 +195,7 @@ setTranslate(e.clientX - startPos  )
     <div
     onPointerMove ={moveListener ? (e) => {handleMove(e)} : undefined} 
     onPointerUp= {moveListener? (e) => {handleEnd(e)} : undefined}
+    onPointerLeave = {moveListener? (e) => {handleEnd(e)} : undefined}
     className="App">
       
       <div
