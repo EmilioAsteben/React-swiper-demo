@@ -7,7 +7,7 @@ import {useRef, useEffect, useState} from 'react';
 function App() {
 
 
-  let startSlide = 2;
+  let startSlide = 3;
   let offset = 0;
   let centeredSlides = false;
   let threshHold = 80;
@@ -18,11 +18,58 @@ function App() {
   let [currentSlide, setCurrentSlide] = useState(startSlide);
   let [initialTranslate, setinitialTranslate] = useState(0);
   let [startPos, setStartPos] = useState();
-  let [transition, setTransition] = useState('0s');
+  let [transition, setTransition] = useState('');
   let [transitionEnded, setTransitionEnded] = useState(true); 
   let [translate, setTranslate] = useState(offset);
   let [moveListener, setmoveListener] = useState('');
+  let [windowSize, setWindowSize] = useState(window.innerWidth);
   let [minimalTranslate, setMinimalTranslate] = useState(offset);
+
+
+
+  useEffect(()=>{
+    
+    let swiperItems = swiperRef.current.childNodes;
+    
+
+    function debounce(fn, ms) {
+      let timer
+      return _ => {
+        clearTimeout(timer)
+        timer = setTimeout(_ => {
+          timer = null
+          fn.apply(this, arguments)
+        }, ms)
+      }}
+
+    
+      
+ 
+
+    let debouncedHandleResize = debounce(   function handleResize(){
+      setTransition('300ms');
+    
+      centeredSlides ?
+      setTranslate((swiperRef.current.offsetWidth / 2) - swiperItems[currentSlide].offsetLeft - (swiperItems[currentSlide].offsetWidth / 2 ))
+      
+       
+      //  console.log('centeredslides hook') 
+      :
+      setTranslate(-swiperRef.current.childNodes[currentSlide].offsetLeft - offset);
+      // console.log('not centered slides hook');
+       
+    
+       
+      console.log('new hook works')
+      
+    }, 100)
+    window.addEventListener('resize', debouncedHandleResize);
+
+    return () => window.removeEventListener('resize', debouncedHandleResize)
+  }
+  
+  ,[ currentSlide, transition])
+
 
 
   
@@ -41,6 +88,7 @@ useEffect(() => {
     setTranslate(  swiperItems[0].offsetLeft - swiperItems[currentSlide].offsetLeft - offset  ) 
     setMinimalTranslate(-offset)
     
+    
 
   } else if(centeredSlides){
 
@@ -49,9 +97,11 @@ useEffect(() => {
     
 
   }
-  swiperRef.current.addEventListener('transitionstart', transitionStart);
+  
+  
   console.log('useeffect')
   console.log(startSlide)
+    //  window.addEventListener('resize', handleResize);
 
   // console.log ('swiper width 1/2', swiperWidth / 2)
   // console.log ('item offset', swiperItems[0].offsetLeft)
@@ -73,6 +123,8 @@ useEffect(() => {
 }, []);
 
 
+
+
 function logListenerEvent(){
   console.log('LISTENER LOG',translate, initialTranslate, moveListener,currentSlide)
 }
@@ -80,6 +132,7 @@ function logListenerEvent(){
   
 
 function handleStart(e){
+  !e.isPrimary ? handleEnd() : 
   e.preventDefault();
   let container = containerRef.current.getBoundingClientRect();
   let wrapper = swiperRef.current.getBoundingClientRect();
@@ -88,7 +141,9 @@ function handleStart(e){
   setinitialTranslate(translate);
  
    setStartPos(e.clientX - wrapper.x + container.x)
-
+   console.log('handlestart translate', translate)
+   console.log('handlestart initial translate', initialTranslate)
+   console.log('handleStart')
   
 }
 
@@ -122,7 +177,7 @@ function handleEnd(e){
   
   let swipeLeft = currentSlide != swipeItem.length - 1  ? swipeItem[currentSlide].offsetLeft - swipeItem[currentSlide].nextSibling.offsetLeft - nextSlideDiff : ''
   let swipeRight =  currentSlide != 0  ? swipeItem[currentSlide].offsetLeft - swipeItem[currentSlide].previousSibling.offsetLeft  + prevSlideDiff: ''  ;
-  let wrapperX = swiperRef.current.getBoundingClientRect().x;
+
   
   let swipeAccess = Math.sign(xDiff) == Math.sign(initialTranslate);
   
@@ -150,6 +205,10 @@ function handleEnd(e){
     console.log('set current slide and swipe direction:left')
     console.log(swipeDirection)
     
+  } else  {
+    swipeDirection = null;
+
+
   }
 
  
@@ -168,23 +227,25 @@ function handleEnd(e){
   else{
     setTransition('300ms'); setTranslate(initialTranslate + swipeDirection)
     console.log('next position')
+    console.log('swipedirection', swipeDirection);
   }
  console.log('minimal translate', minimalTranslate);
  console.log('max translate',maxTranslate);
  console.log('initial translate', initialTranslate);
+ console.log('translate', translate);
   
 }
 
 
 
 
-function handleOut(){
-  
-}
+
+
+
 
 function handleMove(e){
 
-
+e.preventDefault();
   // setTransition('0ms');
 setTranslate(e.clientX - startPos  )
 
@@ -200,6 +261,7 @@ setTranslate(e.clientX - startPos  )
     className="App">
       
       <div
+      
       onPointerDown ={(e) => {handleStart(e);}} 
       ref={containerRef}
       className="swiper_container">
@@ -222,11 +284,9 @@ setTranslate(e.clientX - startPos  )
         
         // onPointerDown ={(e) => {handleStart(e);}} 
         
-        onPointerLeave = {() => {handleOut()}}
         
-        onTransitionEnd = {()=>{setTransition('0ms'); setTransitionEnded(true); 
         
-        ;}}
+        
         
        
         

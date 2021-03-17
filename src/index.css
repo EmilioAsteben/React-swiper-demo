@@ -17,10 +17,11 @@ body {
   display: flex;
   justify-content: space-around;
   background-color: coral;
-  width: 40%;
+  width: 80%;
   overflow: hidden;
   height: auto;
   margin: 0 auto 0 auto;
+  touch-action: pan-y;
 
 
 }
@@ -38,8 +39,8 @@ justify-content: space-between;
 }
 
 .item_one{
-  width:100%;
-  flex-shrink: 0;
+  flex-basis: 40px;
+ 
   height: 180px;
   background-color: darkgreen;
   
@@ -47,8 +48,8 @@ justify-content: space-between;
 }
 
 .item_two{
-  width:100%;
-  flex-shrink: 0;
+  flex-basis: 50px;
+ 
   height: 180px;
   background-color: rosybrown;
   
@@ -56,8 +57,8 @@ justify-content: space-between;
 }
 
 .item_three{
-  width:100%;
-  flex-shrink: 0;
+  flex-basis: 30px;
+  
   height: 180px;
   background-color: rgb(15, 160, 170);
   
@@ -65,8 +66,8 @@ justify-content: space-between;
 }
 
 .item_four{
-  width:100%;
-  flex-shrink: 0;
+  flex-basis: 40px;
+  
   height: 180px;
   background-color: rgb(233, 47, 14);
 
