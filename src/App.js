@@ -4,7 +4,33 @@ import {useRef, useEffect, useState} from 'react';
 
 
 
+
+
 function App() {
+
+
+
+    let firstClientX, clientX; //Coordinates. Prevent vertical scroll
+
+    const preventTouch = e => {
+    const minValue = 5; // Threshold. Prevent vertical scroll
+    
+  
+    clientX = e.touches[0].clientX - firstClientX;
+  
+    // Vertical scrolling does not work when you start swiping horizontally.
+    if (Math.abs(clientX) > minValue) {
+      
+      e.preventDefault();
+      
+  
+      return false;
+    }
+  };
+  
+  const touchStart = e => {
+    firstClientX = e.touches[0].clientX;
+  };
 
 
   let startSlide = 3;
@@ -25,6 +51,30 @@ function App() {
   let [windowSize, setWindowSize] = useState(window.innerWidth);
   let [minimalTranslate, setMinimalTranslate] = useState(offset);
 
+  useEffect(() => {
+    
+      containerRef.current.addEventListener("touchstart", touchStart);
+      containerRef.current.addEventListener("touchmove", preventTouch, {
+        passive: false
+        
+      });
+    
+      console.log('hook called')
+    return () => {
+      if (containerRef.current) {
+        containerRef.current.removeEventListener("touchstart", touchStart);
+        containerRef.current.removeEventListener("touchmove", preventTouch, {
+          passive: false
+        });
+        console.log('hook removed')
+      }
+    };
+  },[initialTranslate]);
+
+
+  
+
+  
 
 
   useEffect(()=>{
@@ -78,6 +128,7 @@ function App() {
 
 useEffect(() => {
   //  document.addEventListener('pointerup', logListenerEvent)
+  // window.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
   
   let swiperWidth = swiperRef.current.offsetWidth;
   let swiperItems = swiperRef.current.childNodes;
@@ -132,7 +183,7 @@ function logListenerEvent(){
   
 
 function handleStart(e){
-  !e.isPrimary ? handleEnd() : 
+  // !e.isPrimary ? handleEnd() : 
   e.preventDefault();
   let container = containerRef.current.getBoundingClientRect();
   let wrapper = swiperRef.current.getBoundingClientRect();
@@ -229,6 +280,7 @@ function handleEnd(e){
     console.log('next position')
     console.log('swipedirection', swipeDirection);
   }
+  
  console.log('minimal translate', minimalTranslate);
  console.log('max translate',maxTranslate);
  console.log('initial translate', initialTranslate);
@@ -244,10 +296,12 @@ function handleEnd(e){
 
 
 function handleMove(e){
+  
 
-e.preventDefault();
-  // setTransition('0ms');
+
+  
 setTranslate(e.clientX - startPos  )
+
 
 }
 
@@ -275,6 +329,7 @@ setTranslate(e.clientX - startPos  )
           transform: `translate3d(${translate +'px'}, 0px, 0px)`,
           transitionProperty: 'transform',
           transitionDuration: transition,
+          
 
           
         }}

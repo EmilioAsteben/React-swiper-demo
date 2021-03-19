@@ -21,7 +21,7 @@ body {
   overflow: hidden;
   height: auto;
   margin: 0 auto 0 auto;
-  touch-action: pan-y;
+  /* touch-action: pan-x; */
 
 
 }
