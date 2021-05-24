@@ -305,8 +305,8 @@ function App() {
       </div>
 
       <footer>
-        <a href="https://github.com/EmilioAsteben/React-Swiper">
-          github.com/EmilioAsteben/React-Swiper
+        <a href="https://github.com/EmilioAsteben/React-swiper-demo">
+          Github
         </a>
       </footer>
     </div>
