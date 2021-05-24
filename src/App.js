@@ -1,362 +1,314 @@
-import logo from './logo.svg';
-import './App.css';
-import {useRef, useEffect, useState} from 'react';
+import Swiper from "./Swiper";
+import "./swiper.css";
+import "./custom.css";
+import "highlight.js/styles/atom-one-dark.css";
+import hljs from "highlight.js";
 
-
-
-
+hljs.highlightAll();
 
 function App() {
-
-
-
-    let firstClientX, clientX; //Coordinates. Prevent vertical scroll
-
-    const preventTouch = e => {
-    const minValue = 5; // Threshold. Prevent vertical scroll
-    
-  
-    clientX = e.touches[0].clientX - firstClientX;
-  
-    // Vertical scrolling does not work when you start swiping horizontally.
-    if (Math.abs(clientX) > minValue) {
-      
-      e.preventDefault();
-      
-  
-      return false;
-    }
-  };
-  
-  const touchStart = e => {
-    firstClientX = e.touches[0].clientX;
-  };
-
-
-  let startSlide = 3;
-  let offset = 0;
-  let centeredSlides = false;
-  let threshHold = 80;
-  let spaceBetween = '50px'
-  let numberOfSlides;
-  let swiperRef = useRef(null);
-  let containerRef = useRef(null);
-  let [currentSlide, setCurrentSlide] = useState(startSlide);
-  let [initialTranslate, setinitialTranslate] = useState(0);
-  let [startPos, setStartPos] = useState();
-  let [transition, setTransition] = useState('');
-  let [transitionEnded, setTransitionEnded] = useState(true); 
-  let [translate, setTranslate] = useState(offset);
-  let [moveListener, setmoveListener] = useState('');
-  let [windowSize, setWindowSize] = useState(window.innerWidth);
-  let [minimalTranslate, setMinimalTranslate] = useState(offset);
-
-  useEffect(() => {
-    
-      containerRef.current.addEventListener("touchstart", touchStart);
-      containerRef.current.addEventListener("touchmove", preventTouch, {
-        passive: false
-        
-      });
-    
-      console.log('hook called')
-    return () => {
-      if (containerRef.current) {
-        containerRef.current.removeEventListener("touchstart", touchStart);
-        containerRef.current.removeEventListener("touchmove", preventTouch, {
-          passive: false
-        });
-        console.log('hook removed')
-      }
-    };
-  },[initialTranslate]);
-
-
-  
-
-  
-
-
-  useEffect(()=>{
-    
-    let swiperItems = swiperRef.current.childNodes;
-    
-
-    function debounce(fn, ms) {
-      let timer
-      return _ => {
-        clearTimeout(timer)
-        timer = setTimeout(_ => {
-          timer = null
-          fn.apply(this, arguments)
-        }, ms)
-      }}
-
-    
-      
- 
-
-    let debouncedHandleResize = debounce(   function handleResize(){
-      setTransition('300ms');
-    
-      centeredSlides ?
-      setTranslate((swiperRef.current.offsetWidth / 2) - swiperItems[currentSlide].offsetLeft - (swiperItems[currentSlide].offsetWidth / 2 ))
-      
-       
-      //  console.log('centeredslides hook') 
-      :
-      setTranslate(-swiperRef.current.childNodes[currentSlide].offsetLeft - offset);
-      // console.log('not centered slides hook');
-       
-    
-       
-      console.log('new hook works')
-      
-    }, 100)
-    window.addEventListener('resize', debouncedHandleResize);
-
-    return () => window.removeEventListener('resize', debouncedHandleResize)
-  }
-  
-  ,[ currentSlide, transition])
-
-
-
-  
-
-
-
-useEffect(() => {
-  //  document.addEventListener('pointerup', logListenerEvent)
-  // window.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
-  
-  let swiperWidth = swiperRef.current.offsetWidth;
-  let swiperItems = swiperRef.current.childNodes;
-  let centeredPosition = (swiperWidth / 2) - swiperItems[currentSlide].offsetLeft - (swiperItems[currentSlide].offsetWidth / 2 ) ;
-  
-  if(currentSlide != 0 && !centeredSlides) {
-  
-    setTranslate(  swiperItems[0].offsetLeft - swiperItems[currentSlide].offsetLeft - offset  ) 
-    setMinimalTranslate(-offset)
-    
-    
-
-  } else if(centeredSlides){
-
-    setTranslate(centeredPosition - offset);
-    setMinimalTranslate( swiperWidth / 2 - swiperItems[0].offsetLeft - swiperItems[0].offsetWidth /2 - offset)
-    
-
-  }
-  
-  
-  console.log('useeffect')
-  console.log(startSlide)
-    //  window.addEventListener('resize', handleResize);
-
-  // console.log ('swiper width 1/2', swiperWidth / 2)
-  // console.log ('item offset', swiperItems[0].offsetLeft)
-  // console.log ('item width'swiperItems[0].offsetWidth)
-
-  
-  
-    
-  // for (let key in swiperItems){
-    
-
-  //   if (swiperItems.hasOwnProperty(key)) {
-  //     swiperItems[key].style.marginRight = spaceBetween;
-  // }
-  // }
-
- 
- 
-}, []);
-
-
-
-
-function logListenerEvent(){
-  console.log('LISTENER LOG',translate, initialTranslate, moveListener,currentSlide)
-}
-
-  
-
-function handleStart(e){
-  // !e.isPrimary ? handleEnd() : 
-  e.preventDefault();
-  let container = containerRef.current.getBoundingClientRect();
-  let wrapper = swiperRef.current.getBoundingClientRect();
-  setTransition('0ms');
-  setmoveListener(true);
-  setinitialTranslate(translate);
- 
-   setStartPos(e.clientX - wrapper.x + container.x)
-   console.log('handlestart translate', translate)
-   console.log('handlestart initial translate', initialTranslate)
-   console.log('handleStart')
-  
-}
-
-
-
-function transitionStart(){
-  setTransitionEnded(false);
-  
-}
-
-function handleEnd(e){
-  e.preventDefault();
-  setmoveListener(false);
-  let swipeItem = swiperRef.current.childNodes;
-  let maxTranslate = swipeItem[swipeItem.length - 1].offsetLeft - swipeItem[0].offsetLeft - minimalTranslate; 
-  let nextSlideDiff = 0;
-  let prevSlideDiff = 0;
-
-  if(centeredSlides){
-    nextSlideDiff =  currentSlide != swipeItem.length - 1  ?  (swipeItem[currentSlide].nextSibling.offsetWidth -swipeItem[currentSlide].offsetWidth) / 2  : maxTranslate = translate;
-    prevSlideDiff = currentSlide != 0  ? (swipeItem[currentSlide].offsetWidth - swipeItem[currentSlide].previousSibling.offsetWidth) / 2 : '';
-    console.log(minimalTranslate)
-  }
-
-
-  
-
-
-  
-  let xDiff = initialTranslate - translate;
-  
-  let swipeLeft = currentSlide != swipeItem.length - 1  ? swipeItem[currentSlide].offsetLeft - swipeItem[currentSlide].nextSibling.offsetLeft - nextSlideDiff : ''
-  let swipeRight =  currentSlide != 0  ? swipeItem[currentSlide].offsetLeft - swipeItem[currentSlide].previousSibling.offsetLeft  + prevSlideDiff: ''  ;
-
-  
-  let swipeAccess = Math.sign(xDiff) == Math.sign(initialTranslate);
-  
-  
-  
-
-  // left: xDiff > 0   right: xDiff < 0 
-
-  let swipeDirection
-  //  = xDiff < 0 ? 
-  
-  //  110 :
-  
-  // -110 ;
-
-  if(xDiff < 0 && currentSlide > 0 && Math.abs(xDiff) > threshHold){
-    
-    swipeDirection = swipeRight;
-    setCurrentSlide(currentSlide - 1)
-    console.log('set current slide and swipe direction: right')
-  } else if(xDiff>0 && currentSlide != swipeItem.length - 1  && Math.abs(xDiff) > threshHold)  {
-
-    swipeDirection = swipeLeft;
-    setCurrentSlide(currentSlide + 1)
-    console.log('set current slide and swipe direction:left')
-    console.log(swipeDirection)
-    
-  } else  {
-    swipeDirection = null;
-
-
-  }
-
- 
- 
- 
-  if(Math.abs(xDiff) < threshHold  ||
-  
-  initialTranslate <= -maxTranslate && !swipeAccess ||
-  initialTranslate == minimalTranslate && Math.sign(xDiff) < 0 
-  
-  ) {
-  
-   setTransition('300ms'); setTranslate(initialTranslate)
-   console.log('stay initial')
-  }
-  else{
-    setTransition('300ms'); setTranslate(initialTranslate + swipeDirection)
-    console.log('next position')
-    console.log('swipedirection', swipeDirection);
-  }
-  
- console.log('minimal translate', minimalTranslate);
- console.log('max translate',maxTranslate);
- console.log('initial translate', initialTranslate);
- console.log('translate', translate);
-  
-}
-
-
-
-
-
-
-
-
-function handleMove(e){
-  
-
-
-  
-setTranslate(e.clientX - startPos  )
-
-
-}
-
-
   return (
-    <div
-    
-    onPointerMove ={moveListener ? (e) => {handleMove(e)} : undefined} 
-    onPointerUp= {moveListener? (e) => {handleEnd(e)} : undefined}
-    onPointerLeave = {moveListener? (e) => {handleEnd(e)} : undefined}
-    className="App">
-      
-      <div
-      
-      onPointerDown ={(e) => {handleStart(e);}} 
-      ref={containerRef}
-      className="swiper_container">
-        
-        <div
-        
-        ref={swiperRef}
-
-        style ={{
-         
-          transform: `translate3d(${translate +'px'}, 0px, 0px)`,
-          transitionProperty: 'transform',
-          transitionDuration: transition,
-          
-
-          
-        }}
-        // onPointerUp= {moveListener? () => handleEnd() : undefined}
-        
-        // onPointerMove ={moveListener ? (e) => {handleMove(e)} : undefined} 
-        
-        // onPointerDown ={(e) => {handleStart(e);}} 
-        
-        
-        
-        
-        
-       
-        
-        className="swiper_wrapper">
-
-          
-
-          <div  className="item_one"></div>
-          <div className="item_two"></div>
-          <div className="item_three"></div>
-          <div className="item_four"></div>
-
-        </div>
+    <div>
+      <div className="about">
+        <h1>React swiper</h1>
+        <p>
+          Lightweight responsive React Swiper for touchscreen devices. No
+          complex api. Works equally well in vertical and horizontal
+          orientation. Possible to customize the size of the slides and the
+          space between them, using css.{" "}
+        </p>
       </div>
-      <div>{currentSlide}</div>
+
+      <div className="usage">
+        <h1>Usage:</h1>
+
+        <div className="first_step">
+          <p>
+            1) Import <b>swiper</b>, <b>swiper.css</b>.
+          </p>
+          <p>
+            Create and import <b>custom.css</b> to customize slide sizes and
+            spaces between them.{" "}
+          </p>
+          <pre>
+            <code className="javascript code_snippet">
+              {`import Swiper from './Swiper';
+
+    import './swiper.css';
+    import './custom.css';
+
+
+    `}
+            </code>
+          </pre>
+        </div>
+
+        <div className="second_step">
+          <p>2) Add the Swiper to your app like this</p>
+
+          <pre>
+            <code className="jsx code_snippet">
+              {` 
+    <Swiper
+
+    centeredSlides      = {false}      
+    additionalClassName = 'react__swiper' 
+    transitionMs        = '450ms'      
+    offset              = {0}         
+    threshold           = {90}         
+    
+    
+    >
+ 
+    /* No matter what class name you specify. 
+    It is needed to stylize slides in css */ 
+       <div className = 'slide_item'>Slide 1</div> 
+       <div className = 'slide_item'>Slide 2</div>
+       <div className = 'slide_item'>Slide 3</div>
+       <div className = 'slide_item'>Slide 4</div>
+       <div className = 'slide_item'>Slide 5</div>
+
+
+    </Swiper>
+    `}
+            </code>
+          </pre>
+        </div>
+
+        <h3>API</h3>
+
+        <pre>
+          <code className="plaintext code_snippet">
+            {`
+  centeredSlides       // centering slides                  (bool)    default_value: false
+  additionalClassName  // add class to swiper               (string)  default_value: ''
+  transitionMs         // transition duration               (string)  default_value: 300ms
+  offset               // add slide offset                  (number)  default_value: 0
+  threshold            // threshold to swipe current slide  (number)  default_value: 80
+  `}
+          </code>
+        </pre>
+
+        <h3>To justify slides</h3>
+
+        <pre>
+          <code className="css code_snippet">
+            {`
+   /* custom.css */
+
+  .swiper_wrapper{
+    justify-content: space-between;  /* flex-start; etc */
+  }
+
+  `}
+          </code>
+        </pre>
+      </div>
+
+      <h1 className="demos">Demos</h1>
+
+      <div className="fullscreen__slides">
+        <div className="swiper__header">
+          <h1>Fullscreen slides</h1>
+
+          {/* <pre><code className = 'javascript code_snippet'>{``}</code></pre> */}
+
+          <pre>
+            <code className="css code_snippet">
+              {`
+      /* custom.css */
+
+      .slide_item{
+          width: 100%;
+          flex-shrink: 0;
+        }
+  `}
+            </code>
+          </pre>
+        </div>
+
+        <Swiper
+          centeredSlides={false}
+          additionalClassName="fullscreen"
+          transitionMs="450ms"
+          offset={0}
+          threshold={90}
+        >
+          <div className="slide_item first">Slide 1</div>
+          <div className="slide_item second">Slide 2</div>
+          <div className="slide_item third">Slide 3</div>
+          <div className="slide_item fourth">Slide 4</div>
+          <div className="slide_item fifth">Slide 5</div>
+        </Swiper>
+      </div>
+
+      <div className="separated__slides">
+        <div className="swiper__header">
+          <h1>Separated slides</h1>
+
+          <pre>
+            <code className="css code_snippet">
+              {`
+      /* custom.css */
+
+      .slide_item{
+        display: flex;
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: center;
+        height:300px;
+        margin-right:20px;
+        width: 200px;
+        transition: border 0.9s ease-in-out;
+        border: 1px solid rgba(112, 112, 112, 0.219);
+        border-radius: 6px;
+        flex-shrink: 0;
+      }
+    
+      .slide_item:last-of-type{
+        margin-right: 0;
+      }
+  `}
+            </code>
+          </pre>
+        </div>
+
+        <Swiper
+          centeredSlides={false}
+          additionalClassName="separated__slides"
+          transitionMs="450ms"
+        >
+          <div className="slide_item first">Slide 1</div>
+          <div className="slide_item second">Slide 2</div>
+          <div className="slide_item third">Slide 3</div>
+          <div className="slide_item fourth">Slide 4</div>
+          <div className="slide_item fifth">Slide 5</div>
+        </Swiper>
+      </div>
+
+      <div className="centered__slides">
+        <div className="swiper__header">
+          <h1>Centered slides</h1>
+
+          <pre>
+            <code className="javascript code_snippet">
+              {`
+    <Swiper centeredSlides = {true}>
+    </Swiper>
+  `}
+            </code>
+          </pre>
+        </div>
+        <Swiper
+          centeredSlides={true}
+          additionalClassName="centered"
+          transitionMs="450ms"
+        >
+          <div className="slide_item first">Slide 1</div>
+          <div className="slide_item second">Slide 2</div>
+          <div className="slide_item third">Slide 3</div>
+          <div className="slide_item fourth">Slide 4</div>
+          <div className="slide_item fifth">Slide 5</div>
+        </Swiper>
+      </div>
+
+      <div className="different__sizes">
+        <div className="swiper__header">
+          <h1>Different sizes</h1>
+
+          <pre>
+            <code className="css code_snippet">
+              {`
+    /* custom.css */
+
+    .slide_item.first  {
+      width:100px;
+    }
+  
+    .slide_item.second {
+      width:450px;
+    }
+  
+    .slide_item.third  {
+      width: 100px;
+    }
+  
+    .slide_item.fourth {
+      width: 130px;
+    }
+  
+    .slide_item.fifth  {
+      width:250px;
+    }
+  `}
+            </code>
+          </pre>
+        </div>
+        <Swiper
+          centeredSlides={false}
+          additionalClassName="different__sizes"
+          transitionMs="450ms"
+        >
+          <div className="slide_item first">Slide 1</div>
+          <div className="slide_item second">Slide 2</div>
+          <div className="slide_item third">Slide 3</div>
+          <div className="slide_item fourth">Slide 4</div>
+          <div className="slide_item fifth">Slide 5</div>
+        </Swiper>
+      </div>
+
+      <div className="different__spaces">
+        <div className="swiper__header">
+          <h1>Different spaces</h1>
+          <pre>
+            <code className="css code_snippet">
+              {`
+  /* custom.css */
+
+  .swiper_wrapper{
+    justify-content: flex-start;
+
+  }
+
+  .slide_item.first{
+    margin-right: 40px;
+  }
+
+  .slide_item.second{
+    margin-right: 15px;
+  }
+
+  .slide_item.third{
+    margin-right: 70px;
+  }
+
+  .slide_item.fourth{
+    margin-right: 100px;
+  }
+
+  `}
+            </code>
+          </pre>
+        </div>
+
+        <Swiper
+          centeredSlides={false}
+          additionalClassName="separated__slides"
+          transitionMs="450ms"
+        >
+          <div className="slide_item first">Slide 1</div>
+          <div className="slide_item second">Slide 2</div>
+          <div className="slide_item third">Slide 3</div>
+          <div className="slide_item fourth">Slide 4</div>
+          <div className="slide_item fifth">Slide 5</div>
+        </Swiper>
+      </div>
+
+      <footer>
+        <a href="https://github.com/EmilioAsteben/React-Swiper">
+          github.com/EmilioAsteben/React-Swiper
+        </a>
+      </footer>
     </div>
   );
 }
