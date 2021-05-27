@@ -1,6 +1,6 @@
 import Swiper from "./Swiper";
-import "./swiper.css";
-import "./custom.css";
+import "./styles/swiper.css";
+import "./styles/custom.css";
 import "highlight.js/styles/atom-one-dark.css";
 import hljs from "highlight.js";
 
