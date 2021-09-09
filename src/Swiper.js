@@ -4,13 +4,13 @@ function Swiper(props) {
   let startSlide = 0; // first slide
 
   let transitionMs =
-    props.transitionMs == undefined ? "300ms" : props.transitionMs;
+    props.transitionMs === undefined ? "300ms" : props.transitionMs;
 
   // wrapper offset
-  let offset = props.offset == undefined ? 0 : props.offset;
+  let offset = props.offset === undefined ? 0 : props.offset;
 
   // swipestep threshold
-  let threshold = props.threshold == undefined ? 80 : props.threshold;
+  let threshold = props.threshold === undefined ? 80 : props.threshold;
 
   console.log("offset", offset);
   let centeredSlides = false || props.centeredSlides; // centered slides
@@ -66,6 +66,7 @@ function Swiper(props) {
 
   useEffect(() => {
     let swiperItems = swiperRef.current.childNodes;
+    console.log('SWIPER REF', swiperRef.current);
 
     function debounce(fn, ms) {
       let timer;
@@ -115,7 +116,7 @@ function Swiper(props) {
       swiperItems[currentSlide].offsetLeft -
       swiperItems[currentSlide].offsetWidth / 2;
 
-    if (currentSlide != 0 && !centeredSlides) {
+    if (currentSlide !== 0 && !centeredSlides) {
       setTranslate(
         swiperItems[0].offsetLeft -
           swiperItems[currentSlide].offsetLeft -
@@ -184,13 +185,13 @@ function Swiper(props) {
 
     if (centeredSlides) {
       nextSlideDiff =
-        currentSlide != swipeItem.length - 1
+        currentSlide !== swipeItem.length - 1
           ? (swipeItem[currentSlide].nextSibling.offsetWidth -
               swipeItem[currentSlide].offsetWidth) /
             2
           : (maxTranslate = translate);
       prevSlideDiff =
-        currentSlide != 0
+        currentSlide !== 0
           ? (swipeItem[currentSlide].offsetWidth -
               swipeItem[currentSlide].previousSibling.offsetWidth) /
             2
@@ -201,19 +202,19 @@ function Swiper(props) {
     let xDiff = initialTranslate - translate;
 
     let swipeLeft =
-      currentSlide != swipeItem.length - 1
+      currentSlide !== swipeItem.length - 1
         ? swipeItem[currentSlide].offsetLeft -
           swipeItem[currentSlide].nextSibling.offsetLeft -
           nextSlideDiff
         : "";
     let swipeRight =
-      currentSlide != 0
+      currentSlide !== 0
         ? swipeItem[currentSlide].offsetLeft -
           swipeItem[currentSlide].previousSibling.offsetLeft +
           prevSlideDiff
         : "";
 
-    let swipeAccess = Math.sign(xDiff) == Math.sign(initialTranslate);
+    let swipeAccess = Math.sign(xDiff) === Math.sign(initialTranslate);
 
     let swipeDirection;
 
@@ -227,7 +228,7 @@ function Swiper(props) {
    
     } else if (
       xDiff > 0 &&
-      currentSlide != swipeItem.length - 1 &&
+      currentSlide !== swipeItem.length - 1 &&
       Math.abs(xDiff) > threshold
     ) {
       swipeDirection = swipeLeft;
@@ -244,7 +245,7 @@ function Swiper(props) {
     if (
       Math.abs(xDiff) < threshold ||
       (initialTranslate <= -maxTranslate && !swipeAccess) ||
-      (initialTranslate == minimalTranslate && Math.sign(xDiff) < 0)
+      (initialTranslate === minimalTranslate && Math.sign(xDiff) < 0)
     ) {
       setTransition(transitionMs);
       setTranslate(initialTranslate);
@@ -293,7 +294,7 @@ function Swiper(props) {
       }
       className={
         `Swiper` +
-        (props.additionalClassName != undefined
+        (props.additionalClassName !== undefined
           ? " " + props.additionalClassName
           : "")
       }
