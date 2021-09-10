@@ -2,7 +2,7 @@
 
 Lightweight responsive React Swiper for touchscreen devices. No complex api. Works equally well in vertical and horizontal orientation. Possible to customize the size of the slides and the space between them, using css.
 
-<<<<<<< HEAD
+
 ## To Get started
 
 ### `git clone https://github.com/EmilioAsteben/React-swiper-demo.git`
@@ -28,8 +28,8 @@ Lightweight responsive React Swiper for touchscreen devices. No complex api. Wor
 
 [DEMO](https://react-swiper.web.app/ "Title")  
 
-![demo image](https://github.com/EmilioAsteben/React-swiper-demo/blob/main/demo.png?raw=true)  
-![demo image](https://github.com/EmilioAsteben/React-swiper-demo/blob/main/demo_2.png?raw=true)
+![demo image](https://github.com/EmilioAsteben/React-swiper-demo/blob/main/demo_2.png?raw=true)  
+![demo image](https://github.com/EmilioAsteben/React-swiper-demo/blob/main/demo.png?raw=true)
 =======
 
 
