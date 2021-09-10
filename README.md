@@ -30,18 +30,7 @@ Lightweight responsive React Swiper for touchscreen devices. No complex api. Wor
 
 ![demo image](https://github.com/EmilioAsteben/React-swiper-demo/blob/main/demo_2.png?raw=true)  
 ![demo image](https://github.com/EmilioAsteben/React-swiper-demo/blob/main/demo.png?raw=true)
-=======
 
 
-### `git clone https://github.com/EmilioAsteben/React-swiper-demo.git`
 
 
-### `npm install`
-
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
->>>>>>> 5d98fa77fd781260607679fd63ccd056a67f8ef0
